@@ -8,7 +8,7 @@ Color mapping is yet unsupported, all the cloud will have the same color, specif
 
 Run `make` or `gen_obj` to compile the OBJ-based generator.
 
-Rune `make gen_grid` to compile the bounding-box-based generator.
+Run `make gen_grid` to compile the bounding-box-based generator.
 
 Run `make gen_obj_example` for an example that uses `shape.obj` (needs to be provided) to create a `red_shadow` and a `cyan_shadow` functions.
 

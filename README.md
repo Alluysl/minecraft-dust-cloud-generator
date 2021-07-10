@@ -45,3 +45,7 @@ Model (by Ikki_3d, remeshed to reduce polycount):
 Result (repeat):
 
 ![Result with a repeating command block](img/crewmate_repeat.png)
+
+## Special thanks
+
+This program makes use of the [`stb_image` library](https://github.com/nothings/stb/blob/master/stb_image.h).

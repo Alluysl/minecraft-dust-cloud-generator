@@ -6,7 +6,7 @@ Color mapping is yet unsupported, all the cloud will have the same color, specif
 
 ## Compilation
 
-Run `make` or `gen_obj` to compile the OBJ-based generator.
+Run `make` or `make gen_obj` to compile the OBJ-based generator.
 
 Run `make gen_grid` to compile the bounding-box-based generator.
 

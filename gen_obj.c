@@ -70,8 +70,10 @@ int main(int argc, char* argv[]){
 	char buf[LEN];
 	char bin[LEN];
 	
-	long lineCount = 0;
+	if (fputs("# Generated using https://github.com/Alluysl/minecraft-dust-cloud-generator\n", fo) == EOF)
+		yeet("Problem while writing to output file\n", 1);
 	
+	long lineCount = 0;
 	int keepGoing = 1;
 	while (keepGoing){
 		keepGoing = read_short_line_truncated(f, buf, bin, LEN);

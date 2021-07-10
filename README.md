@@ -19,3 +19,29 @@ Run `make clean` to remove the executables.
 `gen_obj <input file> <output file> <r> <g> <b> <particle size> <boxX> <boxY> <boxZ> <speed> <count> <chance of the particle being 'force' instead of 'normal'>`
 
 `gen_grid` (hard-coded values, change them in `gen_grid.c`)
+
+## Gallery
+
+### Steve
+
+Model:
+
+![Steve model in Blender](img/steve_model.png)
+
+Result (impulse):
+
+![Result with an impulse command block](img/steve_impulse.png)
+
+Result (repeat):
+
+![Result with a repeating command block](img/steve_repeat.png)
+
+### Crewmate
+
+Model (by Ikki_3d, remeshed to reduce polycount):
+
+![Crewmate model in Blender](img/crewmate_model.png)
+
+Result (repeat):
+
+![Result with a repeating command block](img/crewmate_repeat.png)

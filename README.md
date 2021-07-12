@@ -1,4 +1,4 @@
-# Dust particle generator
+# Dust particle cloud generator
 
 A Unix program that creates mcfunction files that spawn dust particle clouds, from the vertices described in an OBJ file, and one that creates said files from a hard-coded bounding box.
 

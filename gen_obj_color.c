@@ -247,7 +247,7 @@ int main(int argc, char* argv[]){
 			r, g, b, a * size,
 			v.x, v.y, v.z, bx, by, bz,
 			speed, count,
-			force == 1.0 ? "force" : force == 0.0 ? "normal" : force * RAND_MAX >= rand() ? "force" : "normal") <= 0)
+			a * force == 1.0f ? "force" : a * force == 0.0f ? "normal" : a * force * RAND_MAX >= rand() ? "force" : "normal") <= 0)
 			yeet("Problem while writing to output file\n", 1);
 		
 		++lineCount;

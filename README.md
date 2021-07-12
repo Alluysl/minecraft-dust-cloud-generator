@@ -18,7 +18,7 @@ Run `make clean` to remove the executables.
 
 ## Usage
 
-`gen_obj_color <input file> <output file> <RGB-driving image file> <particle size> <boxX> <boxY> <boxZ> <speed> <count> <chance of the particle being 'force' instead of 'normal'>` (the alpha channel multiplies the scale of the particles)
+`gen_obj_color <input file> <output file> <RGB-driving image file> <particle size> <boxX> <boxY> <boxZ> <speed> <count> <chance of the particle being 'force' instead of 'normal'>` (the alpha channel multiplies the scale of the particles and their 'force' chance)
 
 `gen_obj <input file> <output file> <r> <g> <b> <particle size> <boxX> <boxY> <boxZ> <speed> <count> <chance of the particle being 'force' instead of 'normal'>`
 

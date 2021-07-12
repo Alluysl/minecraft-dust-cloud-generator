@@ -42,6 +42,18 @@ Run `make clean` to remove the executables.
 
 ## Gallery
 
+### Texture
+
+#### Steve
+
+Model:
+
+![Subdivided Steve model in Blender](img/steve_model.png)
+
+Result (repeat):
+
+![Result with a repeating command block](img/steve_repeat.png)
+
 ### Single color
 
 #### Steve-like

@@ -42,21 +42,23 @@ Run `make clean` to remove the executables.
 
 ## Gallery
 
-### Steve
+### Single color
+
+#### Steve-like
 
 Model:
 
-![Steve model in Blender](img/steve_model.png)
+![Model in Blender](img/steve_omni_model.png)
 
 Result (impulse):
 
-![Result with an impulse command block](img/steve_impulse.png)
+![Result with an impulse command block](img/steve_omni_impulse.png)
 
 Result (repeat):
 
-![Result with a repeating command block](img/steve_repeat.png)
+![Result with a repeating command block](img/steve_omni_repeat.png)
 
-### Crewmate
+#### Crewmate
 
 Model (by Ikki_3d, remeshed to reduce polycount):
 

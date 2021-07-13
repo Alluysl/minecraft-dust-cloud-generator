@@ -1,4 +1,4 @@
-#include "lib/stb_image.h"
+#include "../../lib/stb_image.h"
 
 #ifndef texture_h_included
 #define texture_h_included

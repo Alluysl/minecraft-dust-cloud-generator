@@ -2,7 +2,7 @@
 #include <string.h>
 
 #include "obj.h"
-#include "texture.h"
+#include "util/texture.h"
 
 char* lastError = "No error";
 

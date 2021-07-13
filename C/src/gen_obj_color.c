@@ -34,8 +34,10 @@ int main(int argc, char* argv[]){
 	if ((r = sscanf(argv[10], "%f", &force)) != 1) yeet("Couldn't parse force chance\n", r == -1);
 	
 	objData* data = objData_load_from_file(argv[1], argv[3]);
-	if (data == NULL)
-		yeet(objData_get_error(), 1);
+	if (data == NULL){
+		char* err = objData_get_error(&r);
+		yeet(err, r);
+	}
 	
 	FILE* fo = fopen(argv[2], "w");
 	if (fo == NULL) yeet("Couldn't open output file\n", 1);

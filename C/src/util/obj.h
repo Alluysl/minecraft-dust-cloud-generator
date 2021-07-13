@@ -1,3 +1,4 @@
+#include "faceArray.h"
 #include "vector.h"
 
 #ifndef obj_h_included
@@ -9,7 +10,7 @@ typedef struct {
 	
 	vector3fArray vertices;
 	vector3fArray uv;
-	vector3lArray faceVertices;
+	faceArray faces;
 	vector4f* vertexColors;
 	
 } objData;

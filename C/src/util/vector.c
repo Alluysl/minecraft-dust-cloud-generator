@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <math.h>
 #include "vector.h"
 
 /* vector3f */
@@ -11,6 +12,26 @@ vector3f vector3f_of(float x, float y, float z){
 vector3f vector3f_zero(){
 	vector3f res = { 0, 0, 0 };
 	return res;
+}
+
+vector3f vector3f_add(vector3f a, vector3f b){
+	
+	vector3f res = { a.x + b.x, a.y + b.y, a.z + b.z };
+	return res;
+}
+
+vector3f vector3f_subtract(vector3f subtractee, vector3f subtractor){
+	
+	vector3f res = {
+			subtractee.x - subtractor.x,
+			subtractee.y - subtractor.y,
+			subtractee.z - subtractor.z
+		};
+	return res;
+}
+
+vector3f vector3f_difference(vector3f from, vector3f to){
+	return vector3f_subtract(to, from);
 }
 
 int vector3fArray_init(vector3fArray* arr, size_t initialSize){

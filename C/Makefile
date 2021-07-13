@@ -1,8 +1,8 @@
 SRC = src
 UTIL = src/util
 
-gen_obj_color: $(SRC)/gen_obj_color.c $(UTIL)/obj.c $(UTIL)/obj.h $(UTIL)/texture.c $(UTIL)/texture.h $(UTIL)/vector.c $(UTIL)/vector.h
-	gcc -o $@ -O2 $(SRC)/gen_obj_color.c $(UTIL)/obj.c $(UTIL)/texture.c $(UTIL)/vector.c -lm -I lib
+gen_obj_color: $(SRC)/gen_obj_color.c $(UTIL)/obj.c $(UTIL)/obj.h $(UTIL)/texture.c $(UTIL)/texture.h $(UTIL)/faceArray.c $(UTIL)/faceArray.h $(UTIL)/vector.c $(UTIL)/vector.h
+	gcc -o $@ -O2 $(SRC)/gen_obj_color.c $(UTIL)/obj.c $(UTIL)/texture.c $(UTIL)/faceArray.c $(UTIL)/vector.c -lm -I lib
 
 gen_obj: $(SRC)/gen_obj.c
 	gcc -o $@ -O2 $(SRC)/gen_obj.c

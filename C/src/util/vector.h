@@ -11,6 +11,9 @@ typedef struct {
 
 vector3f vector3f_of(float x, float y, float z);
 vector3f vector3f_zero();
+vector3f vector3f_add(vector3f a, vector3f b);
+vector3f vector3f_subtract(vector3f subtractee, vector3f subtractor);
+vector3f vector3f_difference(vector3f from, vector3f to);
 
 typedef struct {
 	size_t maxSize;

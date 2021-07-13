@@ -51,8 +51,7 @@ int main(int argc, char* argv[]){
 	if (vertexColorContributionCounts == NULL)
 		yeet("Couldn't allocate vertex color contribution count array\n", 1);
 	
-	int tw, th, tc;
-	texture* tex = load_texture(argv[3], &tw, &th, &tc);
+	texture* tex = load_texture(argv[3]);
 	if (tex == NULL) yeet("Couldn't open texture file\n", 0);
 	
 	int alreadyWarnedId = 0, alreadyWarnedOOB = 0;
@@ -91,7 +90,7 @@ int main(int argc, char* argv[]){
 		// Get the UV and color at that UV
 		uv = vector3fArray_get(&data.uv, faceVtx.y);
 		float r, g, b, a;
-		if (!get_UV_RGBA(tex, tw, th, tc, uv.x, uv.y, 1, 1, &r, &g, &b, &a)){
+		if (!get_UV_RGBA(tex, uv.x, uv.y, 1, 1, &r, &g, &b, &a)){
 			
 			// Add color contribution
 			vertexColors[faceVtx.x * 4] += a;

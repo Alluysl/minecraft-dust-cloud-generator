@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "obj.h"
+#include "util/obj.h"
 
 void yeet(char* message, int usePerror){
 	if (message != NULL)

@@ -4,101 +4,7 @@
 #include <math.h>
 
 #include "obj.h"
-
-#define STB_IMAGE_IMPLEMENTATION
-#include "lib/stb_image.h"
-
-#define LEN 256
-
-void get_pixel_RGBA(stbi_uc* texture, int width, int components, int x, int y, float* r, float* g, float* b, float* a){
-	
-	stbi_uc* pixel = texture + components * (width * y + x);
-	
-	switch (components){
-	
-	case 4: // RGBA
-		
-		*r = pixel[0] / 255.0f;
-		*g = pixel[1] / 255.0f;
-		*b = pixel[2] / 255.0f;
-		*a = pixel[3] / 255.0f;
-		break;
-	
-	case 3: // RGB
-		
-		*r = pixel[0] / 255.0f;
-		*g = pixel[1] / 255.0f;
-		*b = pixel[2] / 255.0f;
-		*a = 1.0f;
-		break;
-	
-	case 2: // GA
-		
-		*r = *g = *b = pixel[0] / 255.0f;
-		*a = pixel[1] / 255.0f;
-		break;
-	
-	default: // G
-		
-		*r = *g = *b = *pixel / 255.0f;
-		*a = 1.0f;
-	}
-}
-
-int get_UV_RGBA(stbi_uc* texture, int width, int height, int components, float u, float v, float* r, float* g, float* b, float* a){
-	
-	int x = u * width,
-		y = (1.0 - v) * height;
-	x -= x == width;
-	y -= y == height;
-	
-	
-	// Attempts at fixing stuff, kept here for later reference
-	/*double x, y, uu, vv;
-	// Wrap repeated
-	uu = fmod(u, 1.0);
-	vv = fmod(v, 1.0);
-	if (uu < 0.0) uu += 1.0;
-	if (vv < 0.0) vv += 1.0;
-	
-	if ((skipIfImageBoundary || skipIfPixelBoundary)
-		&& (uu <= skipDelta || vv <= skipDelta))
-		return 1;
-	
-	x = uu * width;
-	y = (1.0 - vv) * height;
-	
-	if (skipIfPixelBoundary){
-		
-		double bin, xf, yf;
-		xf = modf(x, &bin);
-		yf = modf(y, &bin);
-if (u == 0.671875 && v == 0.1875) printf("u %f v %f uu %lf vv %lf x %lf y %lf xf %lf yf %lf 1.0 - xf %lf 1.0 - yf %lf\n", u, v, uu, vv, x, y, xf, yf, 1.0 - xf, 1.0 - yf);
-		if (xf <= skipDelta || yf <= skipDelta
-			|| 1.0 - xf  <= skipDelta || 1.0 - yf <= skipDelta)
-			return 1;
-	}*/
-	
-	get_pixel_RGBA(texture, width, components, x, y, r, g, b, a);
-	
-	return 0;
-}
-
-int read_short_line_truncated(FILE* f, char* buf, char* bin, int size){
-	char* p = fgets(buf, size, f);
-	if (p == NULL)
-		return 1;
-	buf[size-1] = '\0';
-	p = strrchr(buf, '\n');
-	while (p == NULL){
-		p = fgets(bin, size, f);
-		if (p == NULL)
-			return 1;
-		p = strrchr(buf, '\n');
-	}
-	*p = '\0';
-	return 0;
-}
+#include "texture.h"
 
 void yeet(char* message, int usePerror){
 	if (message != NULL)
@@ -129,34 +35,14 @@ int main(int argc, char* argv[]){
 	if ((r = sscanf(argv[9], "%d", &count)) != 1) yeet("Couldn't parse count\n", r == -1);
 	if ((r = sscanf(argv[10], "%f", &force)) != 1) yeet("Couldn't parse force chance\n", r == -1);
 	
-	FILE* f = fopen(argv[1], "r");
-	if (f == NULL) yeet("Couldn't open input file\n", 1);
-	
 	objData data;
 	if (objData_init(&data))
 		yeet("Couldn't allocate OBJ data structure\n", 1);
-		
-	char buf[LEN];
-	char bin[LEN];
 	
-	long lineCount = 0;
-	int keepGoing = 1, plr, alreadyWarned = 0;
-	while (keepGoing){
-		if (keepGoing = !read_short_line_truncated(f, buf, bin, LEN)){
-			
-			if ((plr = objData_parse_line(buf, &data))){
-				if (plr == OBJ_LP_ERROR)
-					yeet("Couldn't parse line from input file\n", 1);
-				if (plr == OBJ_LP_INVALID && !alreadyWarned){
-					printf("Warning: invalid line %ld, skipping, reconstruction could be wrong, not warning for future lines\n", lineCount + 1);
-					alreadyWarned = 1;
-				}
-			}
-			++lineCount;
-		}
+	char* err;
+	if (objData_load_from_file(&data, argv[1], &err)){
+		yeet(err, 1);
 	}
-	
-	fclose(f); // close input file
 	
 	float* vertexColors = calloc(data.vertices.size * 4, sizeof(float));
 	if (vertexColors == NULL)
@@ -166,11 +52,10 @@ int main(int argc, char* argv[]){
 		yeet("Couldn't allocate vertex color contribution count array\n", 1);
 	
 	int tw, th, tc;
-	stbi_uc* texture = stbi_load(argv[3], &tw, &th, &tc, 0);
-	if (texture == NULL) yeet("Couldn't open texture file\n", 0);
+	texture* tex = load_texture(argv[3], &tw, &th, &tc);
+	if (tex == NULL) yeet("Couldn't open texture file\n", 0);
 	
-	alreadyWarned = 0;
-	int alreadyWarnedOOB = 0;
+	int alreadyWarnedId = 0, alreadyWarnedOOB = 0;
 	for (size_t i = 0; i < data.faceVertices.size; ++i){
 		
 		vector3f uv;
@@ -181,10 +66,10 @@ int main(int argc, char* argv[]){
 		
 		// Get the vertex and UV indices
 		if (!faceVtx.x || !faceVtx.y){ // indices start at 1
-			if (!alreadyWarned){
+			if (!alreadyWarnedId){
 				
 				printf("Warning: invalid face vertex (or UV) index, skipping, not warning for future vertices\n");
-				alreadyWarned = 1;
+				alreadyWarnedId = 1;
 			}
 			continue;
 		}
@@ -206,7 +91,7 @@ int main(int argc, char* argv[]){
 		// Get the UV and color at that UV
 		uv = vector3fArray_get(&data.uv, faceVtx.y);
 		float r, g, b, a;
-		if (!get_UV_RGBA(texture, tw, th, tc, uv.x, uv.y, &r, &g, &b, &a)){
+		if (!get_UV_RGBA(tex, tw, th, tc, uv.x, uv.y, 1, 1, &r, &g, &b, &a)){
 			
 			// Add color contribution
 			vertexColors[faceVtx.x * 4] += a;
@@ -217,7 +102,7 @@ int main(int argc, char* argv[]){
 		}
 	}
 	
-	stbi_image_free(texture); // free image data
+	free_texture(tex); // free image data
 	
 	FILE* fo = fopen(argv[2], "w");
 	if (fo == NULL) yeet("Couldn't open output file\n", 1);
@@ -249,8 +134,6 @@ int main(int argc, char* argv[]){
 			speed, count,
 			a * force == 1.0f ? "force" : a * force == 0.0f ? "normal" : a * force * RAND_MAX >= rand() ? "force" : "normal") <= 0)
 			yeet("Problem while writing to output file\n", 1);
-		
-		++lineCount;
 	}
 	
 	fclose(fo); // close output file

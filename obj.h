@@ -16,6 +16,7 @@ typedef struct {
 typedef enum { OBJ_LP_ERROR = -1, OBJ_LP_SUCCESS = 0 /* set explicitly for clarity */, OBJ_LP_SKIPPED, OBJ_LP_INVALID } objLineParsingResult;
 
 int objData_init(objData* data);
+int objData_load_from_file(objData* data, char* path, char** err);
 objLineParsingResult objData_parse_line(char* line, objData* data);
 void objData_free(objData* data);
 

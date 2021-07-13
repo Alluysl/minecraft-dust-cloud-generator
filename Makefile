@@ -1,5 +1,5 @@
-gen_obj_color: gen_obj_color.c obj.c obj.h vector3.c vector3.h
-	gcc -o $@ -O2 gen_obj_color.c obj.c vector3.c -lm -I lib
+gen_obj_color: gen_obj_color.c texture.c texture.h obj.c obj.h vector3.c vector3.h
+	gcc -o $@ -O2 gen_obj_color.c texture.c obj.c vector3.c -lm -I lib
 
 gen_obj: gen_obj.c
 	gcc -o $@ -O2 gen_obj.c

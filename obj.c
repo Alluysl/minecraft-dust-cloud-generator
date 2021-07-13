@@ -20,6 +20,22 @@ int objData_init(objData* data){
 	return 0;
 }
 
+int read_short_line_truncated(FILE* f, char* buf, char* bin, int size){
+	char* p = fgets(buf, size, f);
+	if (p == NULL)
+		return 1;
+	buf[size-1] = '\0';
+	p = strrchr(buf, '\n');
+	while (p == NULL){
+		p = fgets(bin, size, f);
+		if (p == NULL)
+			return 1;
+		p = strrchr(buf, '\n');
+	}
+	*p = '\0';
+	return 0;
+}
+
 objLineParsingResult objData_parse_line(char* line, objData* data){
 	
 	int r;
@@ -57,6 +73,43 @@ objLineParsingResult objData_parse_line(char* line, objData* data){
 	}
 	
 	return OBJ_LP_SKIPPED;
+}
+
+#define OBJ_LINE_MAX_SIZE 4048
+int objData_load_from_file(objData* data, char* path, char** err){
+		
+	char buf[OBJ_LINE_MAX_SIZE];
+	char bin[OBJ_LINE_MAX_SIZE];
+	
+	long lineCount = 0;
+	int keepGoing = 1, plr, alreadyWarned = 0;
+	
+	FILE* f = fopen(path, "r");
+	if (f == NULL){
+		if (err != NULL)
+			*err = "Couldn't open input file\n"; /* string literals are global and unchanging */
+		return -1;
+	}
+	
+	while (keepGoing){
+		if (keepGoing = !read_short_line_truncated(f, buf, bin, OBJ_LINE_MAX_SIZE)){
+			
+			if ((plr = objData_parse_line(buf, data))){
+				if (plr == OBJ_LP_ERROR){
+					if (err != NULL)
+						*err = "Couldn't parse line from input file\n";
+					return -1;
+				}
+				if (plr == OBJ_LP_INVALID && !alreadyWarned){
+					printf("Warning: invalid line %ld, skipping, not warning for future lines\n", lineCount + 1);
+					alreadyWarned = 1;
+				}
+			}
+			++lineCount;
+		}
+	}
+	
+	return fclose(f);
 }
 
 void objData_free(objData* data){

@@ -2,22 +2,44 @@
 #include <string.h>
 
 #include "obj.h"
+#include "texture.h"
 
-int objData_init(objData* data){
+char* lastError = "No error";
+
+char* objData_get_error(){
+	return lastError;
+}
+
+objData* objData_new(){
 	
-	if (vector3fArray_init(&data->vertices, OBJ_FIELD_ARRAY_START_SIZE))
-		return -1;
+	lastError = "Couldn't create OBJ data structure\n";
+	
+	objData* data = malloc(sizeof(objData));
+	if (data == NULL)
+		return NULL;
+	
+	lastError = "Couldn't initialize OBJ data structure\n";
+	
+	if (vector3fArray_init(&data->vertices, OBJ_FIELD_ARRAY_START_SIZE)){
+		free(data);
+		return NULL;
+	}
 	if (vector3fArray_init(&data->uv, OBJ_FIELD_ARRAY_START_SIZE)){
+		free(data);
 		vector3fArray_free(&data->vertices);
-		return -1;
+		return NULL;
 	}
 	if (vector3lArray_init(&data->faceVertices, OBJ_FIELD_ARRAY_START_SIZE)){
+		free(data);
 		vector3fArray_free(&data->vertices);
 		vector3fArray_free(&data->uv);
-		return -1;
+		return NULL;
 	}
+	data->vertexColors = NULL;
 	
-	return 0;
+	lastError = "No error";
+	
+	return data;
 }
 
 int read_short_line_truncated(FILE* f, char* buf, char* bin, int size){
@@ -36,7 +58,7 @@ int read_short_line_truncated(FILE* f, char* buf, char* bin, int size){
 	return 0;
 }
 
-objLineParsingResult objData_parse_line(char* line, objData* data){
+objLineParsingResult objData_parse_line(objData* data, char* line){
 	
 	int r;
 	if (line[0] == 'v' && line[1] == ' '){
@@ -75,41 +97,147 @@ objLineParsingResult objData_parse_line(char* line, objData* data){
 	return OBJ_LP_SKIPPED;
 }
 
-#define OBJ_LINE_MAX_SIZE 4048
-int objData_load_from_file(objData* data, char* path, char** err){
-		
-	char buf[OBJ_LINE_MAX_SIZE];
-	char bin[OBJ_LINE_MAX_SIZE];
+objData* objData_abort_load(objData* data, char* message){
+	lastError = message;
+	objData_free(data);
+	return NULL;
+}
+
+objData* objData_fill_vertex_colors(objData* data, char* texturePath){
 	
-	long lineCount = 0;
-	int keepGoing = 1, plr, alreadyWarned = 0;
+	texture* tex = NULL;
+	if (texturePath == NULL || *texturePath == '\0')
+		return data;
+
+	int alreadyWarnedId = 0, alreadyWarnedOOB = 0;
 	
-	FILE* f = fopen(path, "r");
-	if (f == NULL){
-		if (err != NULL)
-			*err = "Couldn't open input file\n"; /* string literals are global and unchanging */
-		return -1;
+	vector4f* vertexColors = malloc(data->vertices.size * sizeof(vector4f));
+	if (vertexColors == NULL)
+		return objData_abort_load(data, "Couldn't allocate vertex color buffer array\n");
+	
+	/* uncomment and use -fopenmp option with GCC for parallelization */
+	/* (removed due to not being very useful and */
+	/* Valgrind complaining about non-leaked "possibly lost" blocks) */
+	/* #pragma omp parallel for */
+	for (int i = 0; i < data->vertices.size; ++i)
+		vertexColors[i] = vector4f_zero();
+	
+	long* vertexColorContributionCounts = calloc(data->vertices.size, sizeof(long));
+	if (vertexColorContributionCounts == NULL){
+		free(vertexColors);
+		return objData_abort_load(data, "Couldn't allocate vertex color contribution count array\n");
 	}
 	
-	while (keepGoing){
-		if (keepGoing = !read_short_line_truncated(f, buf, bin, OBJ_LINE_MAX_SIZE)){
-			
-			if ((plr = objData_parse_line(buf, data))){
-				if (plr == OBJ_LP_ERROR){
-					if (err != NULL)
-						*err = "Couldn't parse line from input file\n";
-					return -1;
-				}
-				if (plr == OBJ_LP_INVALID && !alreadyWarned){
-					printf("Warning: invalid line %ld, skipping, not warning for future lines\n", lineCount + 1);
-					alreadyWarned = 1;
-				}
+	if ((tex = load_texture(texturePath)) == NULL){
+		free(vertexColors);
+		free(vertexColorContributionCounts);
+		return objData_abort_load(data, "Couldn't open texture file\n");
+	}
+	
+	for (size_t i = 0; i < data->faceVertices.size; ++i){
+		
+		vector3f uv;
+		vector3l faceVtx;
+		
+		/* Get the vertex face */
+		faceVtx = vector3lArray_get(&data->faceVertices, i); /* copy, not reference, so can safely edit */
+		
+		/* Get the vertex and UV indices */
+		if (!faceVtx.x || !faceVtx.y){ /* indices start at 1 */
+			if (!alreadyWarnedId){
+				
+				printf("Warning: invalid face vertex (or UV) index, skipping, not warning for future vertices\n");
+				alreadyWarnedId = 1;
 			}
-			++lineCount;
+			continue;
+		}
+		faceVtx.x += faceVtx.x > 0 ? -1 : data->vertices.size;
+		faceVtx.y += faceVtx.y > 0 ? -1 : data->uv.size;
+		if (faceVtx.x >= data->vertices.size || faceVtx.y >= data->uv.size
+			|| faceVtx.x < 0 || faceVtx.y < 0){
+			
+			if (!alreadyWarnedOOB){
+				if (faceVtx.x >= data->vertices.size || faceVtx.x < 0)
+					printf("Warning: invalid vertex index %ld (possibly translated from negative), array size %ld, skipping, not warning for future vertices\n", faceVtx.x + 1, data->vertices.size);
+				else
+					printf("Warning: invalid UV index %ld (possibly translated from negative), array size %ld, skipping, not warning for future vertices\n", faceVtx.y + 1, data->uv.size);
+				alreadyWarnedOOB = 1;
+			}
+			continue;
+		}
+		
+		/* Get the UV and color at that UV */
+		uv = vector3fArray_get(&data->uv, faceVtx.y);
+		float r, g, b, a;
+		if (!get_UV_RGBA(tex, uv.x, uv.y, 1, 1, &r, &g, &b, &a)){
+			
+			/* Add color contribution */
+			vertexColors[faceVtx.x].w += a;
+			vertexColors[faceVtx.x].x += r * a;
+			vertexColors[faceVtx.x].y += g * a;
+			vertexColors[faceVtx.x].z += b * a;
+			++vertexColorContributionCounts[faceVtx.x];
 		}
 	}
 	
-	return fclose(f);
+	free_texture(tex); /* free image data */
+	
+	/* uncomment and use -fopenmp option with GCC for parallelization */
+	/* (removed due to not being very useful and */
+	/* Valgrind complaining about non-leaked "possibly lost" blocks) */
+	/* #pragma omp parallel for */
+	for (int i = 0; i < data->vertices.size; ++i){
+		if (vertexColorContributionCounts[i] && vertexColors[i].w){
+			vertexColors[i].x /= vertexColors[i].w;
+			vertexColors[i].y /= vertexColors[i].w;
+			vertexColors[i].z /= vertexColors[i].w;
+			vertexColors[i].w /= vertexColorContributionCounts[i];
+		} else
+			vertexColors[i] = vector4f_zero();
+	}
+	
+	free(vertexColorContributionCounts);
+	data->vertexColors = vertexColors;
+	
+	return data;
+}
+
+#define OBJ_LINE_MAX_SIZE 4048
+objData* objData_load_from_file(char* path, char* texturePath){
+	
+	objData* data = objData_new();
+	if (data == NULL)
+		return NULL;
+	else {
+			
+		char buf[OBJ_LINE_MAX_SIZE];
+		char bin[OBJ_LINE_MAX_SIZE];
+		
+		long lineCount = 0;
+		int keepGoing = 1, plr, alreadyWarned = 0;
+		
+		FILE* f = fopen(path, "r");
+		if (f == NULL)
+			return objData_abort_load(data, "Couldn't open input file\n");
+		
+		while ((keepGoing = !read_short_line_truncated(f, buf, bin, OBJ_LINE_MAX_SIZE))){
+			
+			if ((plr = objData_parse_line(data, buf)) == OBJ_LP_ERROR)
+				return objData_abort_load(data, "Couldn't parse line from input file\n");
+				
+			if (plr == OBJ_LP_INVALID && !alreadyWarned){
+				printf("Warning: invalid line %ld, skipping, not warning for future lines\n", lineCount + 1);
+				alreadyWarned = 1;
+			}
+			
+			++lineCount;
+		}
+		
+		if (fclose(f))
+			printf("Warning: couldn't close input file\n");
+		
+		return objData_fill_vertex_colors(data, texturePath);
+	}
 }
 
 void objData_free(objData* data){
@@ -117,4 +245,6 @@ void objData_free(objData* data){
 	vector3fArray_free(&data->vertices);
 	vector3fArray_free(&data->uv);
 	vector3lArray_free(&data->faceVertices);
+	free(data->vertexColors); /* free(NULL) does nothing by specification */
+	free(data);
 }

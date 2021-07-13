@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include "vector3.h"
+#include "vector.h"
 
 /* vector3f */
 
@@ -113,4 +113,16 @@ int vector3lArray_set(vector3lArray* arr, size_t pos, vector3l v){
 
 void vector3lArray_free(vector3lArray* arr){
 	free(arr->values);
+}
+
+/* vector4f */
+
+vector4f vector4f_of(float x, float y, float z, float w){
+	vector4f res = { x, y, z, w };
+	return res;
+}
+
+vector4f vector4f_zero(){
+	vector4f res = { 0, 0, 0, 0 };
+	return res;
 }

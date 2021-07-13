@@ -28,9 +28,10 @@ int vector3fArray_append(vector3fArray* arr, vector3f v){
 	
 	if (arr->maxSize <= arr->size){
 		
-		arr->maxSize *= 2;
+		arr->maxSize <<= 1;
 		vector3f* newSpace = realloc(arr->values, arr->maxSize * sizeof(vector3f));
 		if (newSpace == NULL){
+			arr->maxSize >>= 1;
 			return -1;
 		}
 		arr->values = newSpace;
@@ -85,9 +86,10 @@ int vector3lArray_append(vector3lArray* arr, vector3l v){
 	
 	if (arr->maxSize <= arr->size){
 		
-		arr->maxSize *= 2;
+		arr->maxSize <<= 1;
 		vector3l* newSpace = realloc(arr->values, arr->maxSize * sizeof(vector3l));
 		if (newSpace == NULL){
+			arr->maxSize >>= 1;
 			return -1;
 		}
 		arr->values = newSpace;

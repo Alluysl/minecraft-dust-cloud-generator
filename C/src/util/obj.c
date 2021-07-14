@@ -49,19 +49,54 @@ objData* objData_new(){
 	return data;
 }
 
-int read_short_line_truncated(FILE* f, char* buf, char* bin, int size){
-	char* p = fgets(buf, size, f);
-	if (p == NULL)
-		return 1;
-	buf[size-1] = '\0';
-	p = strrchr(buf, '\n');
-	while (p == NULL){
-		p = fgets(bin, size, f);
-		if (p == NULL)
-			return 1;
-		p = strrchr(buf, '\n');
+objLineReadingResult read_line(FILE* f, char** line,
+	char* buffer, size_t bufferSize){
+	/* buffer avoids alloc if line is short enough */
+	
+	fpos_t fpos;
+	char* res, *r;
+	int c, size = 0;
+	
+	/* Get line length */
+	
+	if (fgetpos(f, &fpos))
+		return -1;	
+	for (c = fgetc(f); c != '\n' && c != EOF; ++size, c = fgetc(f));
+	if (fsetpos(f, &fpos))
+		return -1;
+	
+	if (!size){
+		if (c == '\n'){
+			fgetc(f); /* consume line */
+			return OBJ_LR_EMPTY;
+		} else
+			return OBJ_LR_EOF;
+	} else
+		size += 1 + (c == '\n'); /* add space for (\n)\0 */
+	
+	/* Allocate needed memory and pull line */
+	
+	if (size > bufferSize){
+		res = malloc(size); /* sizeof(char) == 1 by definition */
+		if (res == NULL)
+			return -1;
+	} else
+		res = buffer;
+	
+	if (fgets(res, size, f) == NULL){
+		/* has to be caused by an error because we already covered */
+		/* the possibility of the line being empty & last (EOF only) */
+		if (res != buffer)
+			free(res);
+		return -1;
 	}
-	*p = '\0';
+	
+	/* Remove new line character if present and return */
+	
+	if ((r = strrchr(res, '\n')) != NULL)
+		*r = '\0';
+	
+	*line = res;
 	return 0;
 }
 
@@ -305,7 +340,7 @@ objData* objData_fill_vertex_colors(objData* data, char* texturePath, double pix
 	return data;
 }
 
-#define OBJ_LINE_MAX_SIZE 4048
+#define OBJ_LINE_BUF_SIZE 256 /* malloc if higher */
 objData* objData_load_from_file(char* path, char* texturePath, double pixelFloatPrecision){
 	
 	objData* data = objData_new();
@@ -313,8 +348,8 @@ objData* objData_load_from_file(char* path, char* texturePath, double pixelFloat
 		return NULL;
 	else {
 			
-		char buf[OBJ_LINE_MAX_SIZE];
-		char bin[OBJ_LINE_MAX_SIZE];
+		char* readLine;
+		char buf[OBJ_LINE_BUF_SIZE];
 		
 		long lineCount = 0;
 		int keepGoing = 1, plr, alreadyWarned = 0;
@@ -323,17 +358,37 @@ objData* objData_load_from_file(char* path, char* texturePath, double pixelFloat
 		if (f == NULL)
 			return objData_abort_load(data, "Couldn't open input file\n", 1);
 		
-		while ((keepGoing = !read_short_line_truncated(f, buf, bin, OBJ_LINE_MAX_SIZE))){
+		while (keepGoing){
 			
-			if ((plr = objData_parse_line(data, buf)) == OBJ_LP_ERROR)
-				return objData_abort_load(data, "Couldn't parse line from input file\n", 1);
+			switch (read_line(f, &readLine, buf, OBJ_LINE_BUF_SIZE)){
+			
+			case -1: /* error */
+				return objData_abort_load(data, "Couldn't read line from input file\n", 1);
+			
+			case 0: /* line successfully read */
 				
-			if (plr == OBJ_LP_INVALID && !alreadyWarned){
-				printf("Warning: invalid line %ld, skipping, not warning for future lines\n", lineCount + 1);
-				alreadyWarned = 1;
-			}
+				if ((plr = objData_parse_line(data, readLine)) == OBJ_LP_ERROR){
+					if (readLine != buf)
+						free(readLine);
+					return objData_abort_load(data, "Couldn't parse line from input file\n", 1);
+				}
+					
+				if (plr == OBJ_LP_INVALID && !alreadyWarned){
+					printf("Warning: invalid line %ld, skipping, not warning for future lines\n", lineCount + 1);
+					alreadyWarned = 1;
+				}
+				
+				++lineCount;
+				if (readLine != buf)
+					free(readLine);
+				break;
 			
-			++lineCount;
+			case OBJ_LR_EOF: /* nothing left to read */
+				keepGoing = 0;
+				break;
+			
+			/* Do nothing in empty case */
+			}
 		}
 		
 		if (fclose(f)) /* not enough of a sole reason to drop everything but still warning */

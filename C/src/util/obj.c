@@ -161,7 +161,7 @@ static inline int isDoublePositive(double d){
 	return !((unsigned long long)d & ((unsigned long long)1 << 63)); /* IEEE 754 go wheeee */
 }
 
-objData* objData_fill_vertex_colors(objData* data, char* texturePath){
+objData* objData_fill_vertex_colors(objData* data, char* texturePath, double pixelFloatPrecision){
 	
 	texture* tex = NULL;
 	if (texturePath == NULL || *texturePath == '\0')
@@ -265,7 +265,8 @@ objData* objData_fill_vertex_colors(objData* data, char* texturePath){
 		
 			/* Get the color at the UV of the vertex on the current face */
 			float r, g, b, a;
-			if (!get_UV_RGBA(tex, uvs[i].x, uvs[i].y, bisector.x >= 0, bisector.y >= 0,
+			if (!get_UV_RGBA(tex, uvs[i].x, uvs[i].y,
+				bisector.x >= 0, bisector.y >= 0, pixelFloatPrecision,
 				&r, &g, &b, &a)){
 				
 				/* Add color contribution */
@@ -305,7 +306,7 @@ objData* objData_fill_vertex_colors(objData* data, char* texturePath){
 }
 
 #define OBJ_LINE_MAX_SIZE 4048
-objData* objData_load_from_file(char* path, char* texturePath){
+objData* objData_load_from_file(char* path, char* texturePath, double pixelFloatPrecision){
 	
 	objData* data = objData_new();
 	if (data == NULL)
@@ -338,7 +339,7 @@ objData* objData_load_from_file(char* path, char* texturePath){
 		if (fclose(f)) /* not enough of a sole reason to drop everything but still warning */
 			printf("Warning: couldn't close input file: %s\n", strerror(errno));
 		
-		return objData_fill_vertex_colors(data, texturePath);
+		return objData_fill_vertex_colors(data, texturePath, pixelFloatPrecision);
 	}
 }
 

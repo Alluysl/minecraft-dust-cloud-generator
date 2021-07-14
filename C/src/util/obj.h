@@ -17,8 +17,8 @@ typedef struct {
 
 typedef enum { OBJ_LP_ERROR = -1, OBJ_LP_SUCCESS = 0 /* set explicitly for clarity */, OBJ_LP_SKIPPED, OBJ_LP_INVALID } objLineParsingResult;
 
-objData* objData_load_from_file(char* path, char* texturePath);
-char* objData_get_error();
+objData* objData_load_from_file(char* path, char* texturePath, double pixelFloatPrecision);
+char* objData_get_error(int* isSystem);
 void objData_free(objData* data);
 
 #endif /* #ifndef obj_h_included */

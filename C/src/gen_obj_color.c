@@ -21,9 +21,10 @@ int main(int argc, char* argv[]){
 	
 	float size, speed, bx, by, bz, force;
 	int count;
+	double pixelFloatPrecision = 0.0;
 	
-	if (argc != 11)
-		yeet("Usage: <executable> <input file> <output file> <RGB-driving image file> <size> <boxX> <boxY> <boxZ> <speed> <count> <force chance>\n", 0);
+	if (argc != 11 && argc != 12)
+		yeet("Usage: <executable> <input file> <output file> <RGB-driving image file> <size> <boxX> <boxY> <boxZ> <speed> <count> <force chance> [<pixel precision>]\n", 0);
 	
 	if ((r = sscanf(argv[4], "%f", &size)) != 1) yeet("Couldn't parse size\n", r == -1);
 	if ((r = sscanf(argv[5], "%f", &bx)) != 1) yeet("Couldn't parse boxX\n", r == -1);
@@ -32,8 +33,9 @@ int main(int argc, char* argv[]){
 	if ((r = sscanf(argv[8], "%f", &speed)) != 1) yeet("Couldn't parse speed\n", r == -1);
 	if ((r = sscanf(argv[9], "%d", &count)) != 1) yeet("Couldn't parse count\n", r == -1);
 	if ((r = sscanf(argv[10], "%f", &force)) != 1) yeet("Couldn't parse force chance\n", r == -1);
+	if (argc > 11 && (r = sscanf(argv[11], "%lf", &pixelFloatPrecision)) != 1) yeet("Couldn't parse pixel precision\n", r == -1);
 	
-	objData* data = objData_load_from_file(argv[1], argv[3]);
+	objData* data = objData_load_from_file(argv[1], argv[3], pixelFloatPrecision);
 	if (data == NULL){
 		char* err = objData_get_error(&r);
 		yeet(err, r);

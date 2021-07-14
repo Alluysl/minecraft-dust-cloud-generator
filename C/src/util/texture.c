@@ -48,8 +48,8 @@ void get_pixel_RGBA(texture* tex, int x, int y, float* r, float* g, float* b, fl
 	}
 }
 
-int get_UV_RGBA(texture* tex,
-	float u, float v, int uDirPositive, int vDirPositive,
+int get_UV_RGBA(texture* tex, float u, float v,
+	int uDirPositive, int vDirPositive, double pixelFloatPrecision,
 	float* r, float* g, float* b, float* a){
 	
 	double uu, vv, x, y, xf, yf, bin;
@@ -61,7 +61,7 @@ int get_UV_RGBA(texture* tex,
 	if (uu < 0.0) uu += 1.0;
 	if (vv < 0.0) vv += 1.0;
 	
-	/* Get floating pixel coordinate */
+	/* Get floating-point pixel coordinate */
 	x = uu * tex->width;
 	y = (1.0 - vv) * tex->height;
 	
@@ -69,11 +69,15 @@ int get_UV_RGBA(texture* tex,
 	xf = modf(x, &bin);
 	yf = modf(y, &bin);
 	
-	/* If falls on pixel border and face is towards top/left */
-	if (!xf && !uDirPositive)
-		x -= 1.0;
-	if (!yf && vDirPositive) /* not negated because of UV-texture V-Y reversal */
-		y -= 1.0;
+	/* If falls on pixel border, make sure the right pixel is sampled*/
+	if (!uDirPositive && xf <= pixelFloatPrecision)
+		x -= 0.5;
+	else if (uDirPositive && pixelFloatPrecision + xf >= 1.0)
+		x += 0.5;
+	if (vDirPositive && yf <= pixelFloatPrecision)
+		y -= 0.5;
+	else if (!vDirPositive && pixelFloatPrecision + yf >= 1.0)
+		y += 0.5;
 	
 	/* Cast */
 	xi = x;

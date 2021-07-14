@@ -36,7 +36,7 @@ Run `make clean` to remove the executables.
 * Box X/Y/Z (floats): the size of the bounding box around the anchor point where the particle will spawn at a random location; corresponds to the command argument. Preferable to leave at `0 0 0`.
 * Speed (float): the speed (in a random direction) the particle will have; corresponds to the command argument. Preferable to leave at `0`.
 * Count (integer): the amount of particles to spawn in a single command; corresponds to the command argument. Better left at `1`.
-* Force chance (float): the chance, between 0 and 1, of any given particle command to be set as `force` instead of `normal`. This will force the particle to display no matter the distance and particle settings. When set low, will make the cloud appear sparser at a distance. When set high, may cause lag on weak computers.
+* Force chance (float): the chance, between 0 and 1, of any given particle command to be set as `force` instead of `normal`. Will be multiplied by the alpha value at the sampled pixel when using `gen_obj_color`. This will force the particle to display no matter the distance and particle settings. When set low, will make the cloud appear sparser at a distance. When set high, may cause lag on weak computers.
 * Pixel precision *[optional]* (double-precision float): the UVs on the model may be placed on the border of a pixel, but not perfectly. In the advent of a UV wrongly bleeding into a pixel it shouldn't be in, setting this value above zero will - on each axis - select the closest pixel toward the inside of the face if close enough. Only use if needed and start with low values: try to find the lowest working value, as higher values will cause colors to become blurry as they become closer to the gap in pixels between vertices. Values above or close to 0.5 are expected to be broken, but shouldn't ever be needed, since that would mean the error corresponds to almost, if not more than half a pixel. Negative values have the same effect as zero, which is none.
 
 ## Limitations
@@ -44,7 +44,6 @@ Run `make clean` to remove the executables.
 ### Generators
 
 * Both OBJ-based generators only consider vertices, they don't "fill" faces with particles.
-* The texture-based generator can't find out which pixel of the texture to sample for a vertex which's UV lands right on the boundary between two pixels, and will always sample the one at the bottom right (except if the UV is at the bottom/right edge of the image, then it selects the last pixel of the column/row) no matter where the other vertices of the face are. [I plan to fix this](https://github.com/Alluysl/minecraft-dust-cloud-generator/issues), in the meantime a workaround is to make it so that UVs of different faces don't share pixels, and double the bottom and right pixels at the borders of UVs.
 * That generator only supports albedo, for obvious reasons.
 * Naturally, the single-color OBJ-based generator only outputs particles of one color.
 * The arguments for the grid version are hard-coded. The grid isn't randomized, and is centered in the XZ plane, though this isn't hard to change.

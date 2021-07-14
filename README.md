@@ -4,6 +4,8 @@ A Unix program that creates mcfunction files that spawn dust particle clouds, fr
 
 Use MinGW or the WSL for usage on Windows. If you want compilation using the MSVC to be available, react to [this issue](https://github.com/Alluysl/minecraft-dust-cloud-generator/issues/3).
 
+[**Click here to see the gallery**](https://github.com/Alluysl/minecraft-dust-cloud-generator#gallery)
+
 ## Compilation
 
 Commands are to be run in the `C` folder, where the makefile is.

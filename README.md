@@ -44,7 +44,7 @@ Run `make clean` to remove the executables.
 ### Generators
 
 * Both OBJ-based generators only consider vertices, they don't "fill" faces with particles.
-* That generator only supports albedo, for obvious reasons.
+* The texture-based generator only supports albedo, for obvious reasons.
 * Naturally, the single-color OBJ-based generator only outputs particles of one color.
 * The arguments for the grid version are hard-coded. The grid isn't randomized, and is centered in the XZ plane, though this isn't hard to change.
 

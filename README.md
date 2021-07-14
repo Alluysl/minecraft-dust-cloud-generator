@@ -57,43 +57,47 @@ Run `make clean` to remove the executables.
 
 ## Gallery
 
+Keep in mind that due to the use of repeating command blocks, results look a bit fuzzier and more solid than what would be shown with an inpulse command block.
+
+All models are mine unless stated otherwise. Umbreon is courtesy of the Pokémon Company's IP, naturally.
+
 ### Texture
 
 #### Steve
 
-Model:
+Model | Result
+:----:|:-----:
+![Subdivided Steve model in Blender](img/steve_model.png) | ![Result with a repeating command block](img/steve_repeat.png)
 
-![Subdivided Steve model in Blender](img/steve_model.png)
+#### Umbreon
 
-Result (repeat):
+Model | Result
+:----:|:-----:
+![Simple Umbreon model in Blender](img/umbreon_model.png) | ![Result with a repeating command block](img/umbreon_repeat.png)
 
-![Result with a repeating command block](img/steve_repeat.png)
+#### Planet
+
+![Planet made with the program and displayed with a repeating command block](img/planet_repeat.png)
 
 ### Single color
 
+#### Katana
+
+Model | Result
+:----:|:-----:
+![Blocky katana model in Blender](img/katana_model.png) | ![Result with a repeating command block](img/katana_repeat.png)
+
 #### Steve-like
 
-Model:
-
-![Model in Blender](img/steve_omni_model.png)
-
-Result (impulse):
-
-![Result with an impulse command block](img/steve_omni_impulse.png)
-
-Result (repeat):
-
-![Result with a repeating command block](img/steve_omni_repeat.png)
+Model | Result (impulse) | Result (repeating)
+:----:|:----------------:|:-----------------:
+![Model in Blender](img/steve_omni_model.png) | ![Result with an impulse command block](img/steve_omni_impulse.png) | ![Result with a repeating command block](img/steve_omni_repeat.png)
 
 #### Crewmate
 
-Model (by Ikki_3d, remeshed to reduce polycount):
-
-![Crewmate model in Blender](img/crewmate_model.png)
-
-Result (repeat):
-
-![Result with a repeating command block](img/crewmate_repeat.png)
+Model (by Ikki_3d, remeshed to reduce polycount) | Result
+:-----------------------------------------------:|:-----:
+![Crewmate model in Blender](img/crewmate_model.png) | ![Result with a repeating command block](img/crewmate_repeat.png)
 
 ## Special thanks
 

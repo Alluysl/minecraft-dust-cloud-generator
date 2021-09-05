@@ -1,14 +1,14 @@
 # Dust particle cloud generator
 
-Two Unix programs that creates mcfunction files that spawn particle clouds, from the vertices described in an OBJ file. The first accepts and outputs any particle, the second accepts a texture file and outputs dust particles with a color which is the average at the given vertex.
-
-Use MinGW or the WSL for usage on Windows. If you want compilation using the MSVC to be available, react to [this issue](https://github.com/Alluysl/minecraft-dust-cloud-generator/issues/3).
+Two programs that create mcfunction files that spawn particle clouds, from the vertices described in an OBJ file. The first accepts and outputs any particle, the second accepts a texture file and outputs dust particles with a color which is the average at the given vertex.
 
 [**Click here to see the gallery**](#gallery)
 
 ## Compilation
 
 Commands are to be run in the `C` folder, where the makefile is.
+
+#### GCC/Make (Unix)
 
 Run `make gen_obj_color` to compile the generator that accepts a texture and outputs dust particles.
 
@@ -19,6 +19,12 @@ Run `make` to compile both.
 Run `make gen_obj_example` for an example that uses `shape.obj` (needs to be provided) to create a `red_shadow` and a `cyan_shadow` functions.
 
 Run `make clean` to remove the executables.
+
+#### MSVC (Windows)
+
+Run `cl src/gen_obj_color.c src/util/*.c -I lib` to compile the generator that accepts a texture and outputs dust particles.
+
+Run `cl src/gen_obj.c` to compile the generator that accepts any particle but no texture.
 
 ## Usage
 
@@ -41,11 +47,21 @@ Run `make clean` to remove the executables.
 
 ### Examples
 
+#### Unix
+
 `./gen_obj_color in.obj out.mcfunction texture.png 1.0 '~' 0.0625 0.0625 0.0625 0 1 1.0`
 
 `./gen_obj in.obj out.mcfunction minecraft:flame ^ 0.25 0.25 0.25 0.0125 2 0.5`
 
 `./gen_obj in.obj out.mcfunction "minecraft:dust 0.2 0.75 0.95 2.5" '~' 0 0 0 0 1 0.25`
+
+#### Windows
+
+`gen_obj_color.exe in.obj out.mcfunction texture.png 1.0 ~ 0.0625 0.0625 0.0625 0 1 1.0`
+
+`gen_obj.exe in.obj out.mcfunction minecraft:flame "^" 0.25 0.25 0.25 0.0125 2 0.5`
+
+`gen_obj.exe in.obj out.mcfunction "minecraft:dust 0.2 0.75 0.95 2.5" ~ 0 0 0 0 1 0.25`
 
 ## Limitations
 

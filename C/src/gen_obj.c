@@ -51,9 +51,9 @@ int main(int argc, char* argv[]){
 			"<executable> <input file> <output file> <particle> <~|^> "
 				"<deltaX> <deltaY> <deltaZ> <speed> <count> <force chance>\n"
 			"Examples:\n"
-			"./gen_obj in.obj out.mcfunction minecraft:flame ^ 0.25 0.25 0.25 0 2 0.5\n"
+			"./gen_obj in.obj out.mcfunction minecraft:flame \"^\" 0.25 0.25 0.25 0 2 0.5\n"
 			"./gen_obj in.obj out.mcfunction "
-				"\"minecraft:dust 0.2 0.75 0.95 2.5\" '~' 0 0 0 0 1 0.25\n",
+				"\"minecraft:dust 0.2 0.75 0.95 2.5\" \"~\" 0 0 0 0 1 0.25\n",
 			0);
 	
 	float x, y, z, speed, bx, by, bz, force;

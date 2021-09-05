@@ -6,6 +6,11 @@
 #include "obj.h"
 #include "texture.h"
 
+#if defined(_WIN32) || defined(_WIN64)
+/* Same signature, thank you StackOverflow */
+#define strtok_r strtok_s
+#endif
+
 char* lastError = "No error";
 int isSystemError = 0;
 
@@ -91,9 +96,11 @@ objLineReadingResult read_line(FILE* f, char** line,
 		return -1;
 	}
 	
-	/* Remove new line character if present and return */
+	/* Remove new line and carriage return characters if present and return */
 	
 	if ((r = strrchr(res, '\n')) != NULL)
+		*r = '\0';
+	if ((r = strrchr(res, '\r')) != NULL)
 		*r = '\0';
 	
 	*line = res;
@@ -347,14 +354,14 @@ objData* objData_load_from_file(char* path, char* texturePath, double pixelFloat
 	if (data == NULL)
 		return NULL;
 	else {
-			
+		
 		char* readLine;
 		char buf[OBJ_LINE_BUF_SIZE];
 		
 		long lineCount = 0;
 		int keepGoing = 1, plr, alreadyWarned = 0;
 		
-		FILE* f = fopen(path, "r");
+		FILE* f = fopen(path, "rb"); /* binary and not text so jumping around actually works on Windows (CRLF issues) */
 		if (f == NULL)
 			return objData_abort_load(data, "Couldn't open input file\n", 1);
 		

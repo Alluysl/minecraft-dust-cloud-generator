@@ -30,7 +30,7 @@ int main(int argc, char* argv[]){
 			"<executable> <input file> <output file> <RGB-driving image file> <size> <~|^> "
 			"<deltaX> <deltaY> <deltaZ> <speed> <count> <force chance> [<pixel precision>]\n"
 			"Example:\n"
-			"./gen_obj_color in.obj out.mcfunction texture.png 1.0 '~' 0.0625 0.0625 0.0625 0 1 1.0\n",
+			"./gen_obj_color in.obj out.mcfunction texture.png 1.0 \"~\" 0.0625 0.0625 0.0625 0 1 1.0\n",
 			0);
 	
 	if ((r = sscanf(argv[4], "%f", &size)) != 1) yeet("Couldn't parse size\n", r == -1);

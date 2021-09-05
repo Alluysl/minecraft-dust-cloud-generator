@@ -4,7 +4,6 @@
 #include "texture.h"
 
 texture* load_texture(char* name){
-	
 	texture* newTex = malloc(sizeof(texture));
 	if (newTex != NULL && (newTex->pixels = stbi_load(name, &newTex->width, &newTex->height, &newTex->components, 0)) == NULL){
 		free(newTex);

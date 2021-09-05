@@ -45,22 +45,27 @@ void yeet(char* message, int usePerror){
 
 int main(int argc, char* argv[]){
 
-	if (argc != 13)
-		yeet("Usage: <executable> <input file> <output file> <r> <g> <b> <size> <boxX> <boxY> <boxZ> <speed> <count> <force chance>\n", 0);
+	if (argc != 10)
+		yeet(
+			"Usage:\n"
+			"<executable> <input file> <output file> <particle> "
+				"<deltaX> <deltaY> <deltaZ> <speed> <count> <force chance>\n"
+			"Examples:\n"
+			"./gen_obj in.obj out.mcfunction minecraft:flame 0.25 0.25 0.25 0 2 0.5\n"
+			"./gen_obj in.obj out.mcfunction "
+				"\"minecraft:dust 0.2 0.75 0.95 2.5\" 0 0 0 0 1 0.25\n",
+			0);
 	
-	float x, y, z, r, g, b, size, speed, bx, by, bz, force;
+	float x, y, z, speed, bx, by, bz, force;
 	int count;
 	
-	if (!get_float_from_string(argv[3], &r)) yeet("Couldn't parse red\n", 1);
-	if (!get_float_from_string(argv[4], &g)) yeet("Couldn't parse green\n", 1);
-	if (!get_float_from_string(argv[5], &b)) yeet("Couldn't parse blue\n", 1);
-	if (!get_float_from_string(argv[6], &size)) yeet("Couldn't parse size\n", 1);
-	if (!get_float_from_string(argv[7], &bx)) yeet("Couldn't parse boxX\n", 1);
-	if (!get_float_from_string(argv[8], &by)) yeet("Couldn't parse boxY\n", 1);
-	if (!get_float_from_string(argv[9], &bz)) yeet("Couldn't parse boxZ\n", 1);
-	if (!get_float_from_string(argv[10], &speed)) yeet("Couldn't parse speed\n", 1);
-	if (!get_int_from_string(argv[11], &count)) yeet("Couldn't parse count\n", 1);
-	if (!get_float_from_string(argv[12], &force)) yeet("Couldn't parse force chance\n", 1);
+	/* argv[3] is the particle */
+	if (!get_float_from_string(argv[4], &bx)) yeet("Couldn't parse boxX\n", 1);
+	if (!get_float_from_string(argv[5], &by)) yeet("Couldn't parse boxY\n", 1);
+	if (!get_float_from_string(argv[6], &bz)) yeet("Couldn't parse boxZ\n", 1);
+	if (!get_float_from_string(argv[7], &speed)) yeet("Couldn't parse speed\n", 1);
+	if (!get_int_from_string(argv[8], &count)) yeet("Couldn't parse count\n", 1);
+	if (!get_float_from_string(argv[9], &force)) yeet("Couldn't parse force chance\n", 1);
 	
 	FILE* f = fopen(argv[1], "r");
 	if (f == NULL) yeet("Couldn't open input file\n", 1);
@@ -78,7 +83,13 @@ int main(int argc, char* argv[]){
 	while (keepGoing){
 		keepGoing = read_short_line_truncated(f, buf, bin, LEN);
 		if (keepGoing){
-			if (parse_line(buf, &x, &y, &z) && fprintf(fo, "particle minecraft:dust %f %f %f %f ~%f ~%f ~%f %f %f %f %f %d %s\n", r, g, b, size, x, y, z, bx, by, bz, speed, count, force == 1.0 ? "force" : force == 0.0 ? "normal" : force * RAND_MAX >= rand() ? "force" : "normal") <= 0) yeet("Problem while writing to output file\n", 1);
+			if (parse_line(buf, &x, &y, &z)
+				&& fprintf(fo, "particle %s ~%f ~%f ~%f %f %f %f %f %d %s\n",
+					argv[3], x, y, z, bx, by, bz, speed, count,
+					force == 1.0 ? "force" : force == 0.0 ? "normal" :
+						force * RAND_MAX >= rand() ? "force" : "normal")
+					<= 0)
+				yeet("Problem while writing to output file\n", 1);
 			++lineCount;
 		}
 	}

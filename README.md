@@ -1,6 +1,6 @@
 # Dust particle cloud generator
 
-A Unix program that creates mcfunction files that spawn dust particle clouds, from the vertices described in an OBJ file, and one that creates said files from a hard-coded bounding box.
+Two Unix programs that creates mcfunction files that spawn particle clouds, from the vertices described in an OBJ file. The first accepts and outputs any particle, the second accepts a texture file and outputs dust particles with a color which is the average at the given vertex.
 
 Use MinGW or the WSL for usage on Windows. If you want compilation using the MSVC to be available, react to [this issue](https://github.com/Alluysl/minecraft-dust-cloud-generator/issues/3).
 
@@ -10,9 +10,11 @@ Use MinGW or the WSL for usage on Windows. If you want compilation using the MSV
 
 Commands are to be run in the `C` folder, where the makefile is.
 
-Run `make` or `make gen_obj_color` to compile the OBJ-based generator that uses a texture.
+Run `make gen_obj_color` to compile the generator that accepts a texture and outputs dust particles.
 
-Run `make gen_obj` to compile the OBJ-based generator that uses a plain color.
+Run `make gen_obj` to compile the generator that accepts any particle but no texture.
+
+Run `make` to compile both.
 
 Run `make gen_obj_example` for an example that uses `shape.obj` (needs to be provided) to create a `red_shadow` and a `cyan_shadow` functions.
 
@@ -20,22 +22,30 @@ Run `make clean` to remove the executables.
 
 ## Usage
 
-`gen_obj_color <input file> <output file> <RGB-driving image file> <particle size> <boxX> <boxY> <boxZ> <speed> <count> <force chance> [<pixel precision>]`
+`gen_obj_color <input file> <output file> <RGB-driving image file> <particle size> <deltaX> <deltaY> <deltaZ> <speed> <count> <force chance> [<pixel precision>]`
 
-`gen_obj <input file> <output file> <r> <g> <b> <particle size> <boxX> <boxY> <boxZ> <speed> <count> <force chance>`
+`gen_obj <input file> <output file> <particle> <deltaX> <deltaY> <deltaZ> <speed> <count> <force chance>`
 
 ### Arguments rundown
 
 * Input file (string): the path to an existing OBJ file containing the model to generate a function file from.
 * Output file (string): the path to the output Minecraft function file (will create the file if it doesn't exist, and clear any old content of the file before writing).
 * Image file: (string, `gen_obj_color` only) the path to texture to get RGBA values from when sampling UVs (essentially, the texture to apply to the model).
-* R/G/B: (floats, `gen_obj` only): the color to give generated particles. Corresponds to the command argument.
-* Particle size (float): corresponds to the command argument. Will be multiplied by the alpha value of the texture at the sampled pixel when using `gen_obj_color`.
-* Box X/Y/Z (floats): the size of the bounding box around the anchor point where the particle will spawn at a random location; corresponds to the command argument. Preferable to leave at `0 0 0`.
+* Particle size (float, `gen_obj_color` only): corresponds to the command argument. Will be multiplied by the alpha value of the texture at the sampled pixel.
+* Particle (string, `gen_obj` only): the actual particle, e.g. `minecraft:bubble`, `minecraft:block minecraft:diamond_block`, ... Make sure to quote this argument if it contains spaces.
+* Delta X/Y/Z (floats): the size of the bounding box around the anchor point where the particle will spawn at a random location; corresponds to the command argument. Preferable to leave at `0 0 0`.
 * Speed (float): the speed (in a random direction) the particle will have; corresponds to the command argument. Preferable to leave at `0`.
 * Count (integer): the amount of particles to spawn in a single command; corresponds to the command argument. Better left at `1`.
 * Force chance (float): the chance, between 0 and 1, of any given particle command to be set as `force` instead of `normal`. Will be multiplied by the alpha value at the sampled pixel when using `gen_obj_color`. This will force the particle to display no matter the distance and particle settings. When set low, will make the cloud appear more sparce at a distance. When set high, may cause lag on weak computers.
 * Pixel precision *[optional]* (double-precision float): the UVs on the model may be placed on the border of a pixel, but not perfectly. In the advent of a UV wrongly bleeding into a pixel it shouldn't be in, setting this value above zero will - on each axis - select the closest pixel toward the inside of the face if close enough. Only use if needed and start with low values: try to find the lowest working value, as higher values will cause colors to become blurry as they become closer to the gap in pixels between vertices. Values above or close to 0.5 are expected to be broken, but shouldn't ever be needed, since that would mean the error corresponds to almost, if not more than half a pixel. Negative values have the same effect as zero, which is none.
+
+### Examples
+
+`./gen_obj_color in.obj out.mcfunction texture.png 1.0 0.0625 0.0625 0.0625 0 1 1.0`
+
+`./gen_obj in.obj out.mcfunction minecraft:flame 0.25 0.25 0.25 0.0125 2 0.5`
+
+`./gen_obj in.obj out.mcfunction "minecraft:dust 0.2 0.75 0.95 2.5" 0 0 0 0 1 0.25`
 
 ## Limitations
 

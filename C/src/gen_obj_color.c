@@ -24,7 +24,13 @@ int main(int argc, char* argv[]){
 	double pixelFloatPrecision = 0.0;
 	
 	if (argc != 11 && argc != 12)
-		yeet("Usage: <executable> <input file> <output file> <RGB-driving image file> <size> <boxX> <boxY> <boxZ> <speed> <count> <force chance> [<pixel precision>]\n", 0);
+		yeet(
+			"Usage:\n"
+			"<executable> <input file> <output file> <RGB-driving image file> <size> "
+			"<deltaX> <deltaY> <deltaZ> <speed> <count> <force chance> [<pixel precision>]\n"
+			"Example:\n"
+			"./gen_obj_color in.obj out.mcfunction texture.png 1.0 0.0625 0.0625 0.0625 0 1 1.0\n",
+			0);
 	
 	if ((r = sscanf(argv[4], "%f", &size)) != 1) yeet("Couldn't parse size\n", r == -1);
 	if ((r = sscanf(argv[5], "%f", &bx)) != 1) yeet("Couldn't parse boxX\n", r == -1);

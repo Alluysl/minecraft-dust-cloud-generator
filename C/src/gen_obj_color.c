@@ -48,11 +48,18 @@ int main(int argc, char* argv[]){
 		yeet("Problem while writing to output file\n", 1);
 	
 	size_t skipped = 0;
+	char isTextureNull = data->vertexColors == NULL;
+	
+	if (isTextureNull)
+		printf("Warning: null texture file, making particles black.\n");
 	
 	for (size_t i = 0; i < data->vertices.size; ++i){
 		
 		vector3f v = vector3fArray_get(&data->vertices, i);
-		vector4f c = data->vertexColors[i];
+		vector4f c = { 0.0f, 0.0f, 0.0f, 1.0f };
+		if (!isTextureNull)
+			c = data->vertexColors[i];
+		
 		if (!c.w){
 			++skipped;
 			continue; // no contribution (vertex was cancelled or is fully transparent)

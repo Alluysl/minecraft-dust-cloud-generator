@@ -45,27 +45,32 @@ void yeet(char* message, int usePerror){
 
 int main(int argc, char* argv[]){
 
-	if (argc != 10)
+	if (argc != 11)
 		yeet(
 			"Usage:\n"
-			"<executable> <input file> <output file> <particle> "
+			"<executable> <input file> <output file> <particle> <~|^> "
 				"<deltaX> <deltaY> <deltaZ> <speed> <count> <force chance>\n"
 			"Examples:\n"
-			"./gen_obj in.obj out.mcfunction minecraft:flame 0.25 0.25 0.25 0 2 0.5\n"
+			"./gen_obj in.obj out.mcfunction minecraft:flame ^ 0.25 0.25 0.25 0 2 0.5\n"
 			"./gen_obj in.obj out.mcfunction "
-				"\"minecraft:dust 0.2 0.75 0.95 2.5\" 0 0 0 0 1 0.25\n",
+				"\"minecraft:dust 0.2 0.75 0.95 2.5\" '~' 0 0 0 0 1 0.25\n",
 			0);
 	
 	float x, y, z, speed, bx, by, bz, force;
 	int count;
 	
 	/* argv[3] is the particle */
-	if (!get_float_from_string(argv[4], &bx)) yeet("Couldn't parse boxX\n", 1);
-	if (!get_float_from_string(argv[5], &by)) yeet("Couldn't parse boxY\n", 1);
-	if (!get_float_from_string(argv[6], &bz)) yeet("Couldn't parse boxZ\n", 1);
-	if (!get_float_from_string(argv[7], &speed)) yeet("Couldn't parse speed\n", 1);
-	if (!get_int_from_string(argv[8], &count)) yeet("Couldn't parse count\n", 1);
-	if (!get_float_from_string(argv[9], &force)) yeet("Couldn't parse force chance\n", 1);
+	char coordSpace = argv[4][0];
+	if (argv[4][1] != '\0')
+		printf("Warning: coordinate space argument was \"%s\", expected ~ or ^, went on with %c. "
+			"You might need to quote the argument.\n", argv[4], coordSpace);
+	
+	if (!get_float_from_string(argv[5], &bx)) yeet("Couldn't parse deltaX\n", 1);
+	if (!get_float_from_string(argv[6], &by)) yeet("Couldn't parse deltaY\n", 1);
+	if (!get_float_from_string(argv[7], &bz)) yeet("Couldn't parse deltaZ\n", 1);
+	if (!get_float_from_string(argv[8], &speed)) yeet("Couldn't parse speed\n", 1);
+	if (!get_int_from_string(argv[9], &count)) yeet("Couldn't parse count\n", 1);
+	if (!get_float_from_string(argv[10], &force)) yeet("Couldn't parse force chance\n", 1);
 	
 	FILE* f = fopen(argv[1], "r");
 	if (f == NULL) yeet("Couldn't open input file\n", 1);
@@ -84,8 +89,10 @@ int main(int argc, char* argv[]){
 		keepGoing = read_short_line_truncated(f, buf, bin, LEN);
 		if (keepGoing){
 			if (parse_line(buf, &x, &y, &z)
-				&& fprintf(fo, "particle %s ~%f ~%f ~%f %f %f %f %f %d %s\n",
-					argv[3], x, y, z, bx, by, bz, speed, count,
+				&& fprintf(fo, "particle %s %c%f %c%f %c%f %f %f %f %f %d %s\n",
+					argv[3],
+					coordSpace, x, coordSpace, y, coordSpace, z,
+					bx, by, bz, speed, count,
 					force == 1.0 ? "force" : force == 0.0 ? "normal" :
 						force * RAND_MAX >= rand() ? "force" : "normal")
 					<= 0)

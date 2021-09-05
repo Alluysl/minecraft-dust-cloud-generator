@@ -22,9 +22,9 @@ Run `make clean` to remove the executables.
 
 ## Usage
 
-`gen_obj_color <input file> <output file> <RGB-driving image file> <particle size> <deltaX> <deltaY> <deltaZ> <speed> <count> <force chance> [<pixel precision>]`
+`gen_obj_color <input file> <output file> <RGB-driving image file> <particle size> <~|^> <deltaX> <deltaY> <deltaZ> <speed> <count> <force chance> [<pixel precision>]`
 
-`gen_obj <input file> <output file> <particle> <deltaX> <deltaY> <deltaZ> <speed> <count> <force chance>`
+`gen_obj <input file> <output file> <particle> <~|^> <deltaX> <deltaY> <deltaZ> <speed> <count> <force chance>`
 
 ### Arguments rundown
 
@@ -41,11 +41,11 @@ Run `make clean` to remove the executables.
 
 ### Examples
 
-`./gen_obj_color in.obj out.mcfunction texture.png 1.0 0.0625 0.0625 0.0625 0 1 1.0`
+`./gen_obj_color in.obj out.mcfunction texture.png 1.0 '~' 0.0625 0.0625 0.0625 0 1 1.0`
 
-`./gen_obj in.obj out.mcfunction minecraft:flame 0.25 0.25 0.25 0.0125 2 0.5`
+`./gen_obj in.obj out.mcfunction minecraft:flame ^ 0.25 0.25 0.25 0.0125 2 0.5`
 
-`./gen_obj in.obj out.mcfunction "minecraft:dust 0.2 0.75 0.95 2.5" 0 0 0 0 1 0.25`
+`./gen_obj in.obj out.mcfunction "minecraft:dust 0.2 0.75 0.95 2.5" '~' 0 0 0 0 1 0.25`
 
 ## Limitations
 

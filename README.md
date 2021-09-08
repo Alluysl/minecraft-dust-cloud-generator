@@ -1,4 +1,4 @@
-# Dust particle cloud generator
+# Minecraft particle cloud generator
 
 Two programs that create mcfunction files that spawn particle clouds, from the vertices described in an OBJ file. The first accepts and outputs any particle, the second accepts a texture file and outputs dust particles with a color which is the average at the given vertex.
 

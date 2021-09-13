@@ -22,9 +22,9 @@ int read_short_line_truncated(FILE* f, char* buf, char* bin, int size){
 
 int parse_line(char* line, float* x, float* y, float* z){
 	if (*line != 'v')
-		return 0;
+		return 1;
 	int r = sscanf(line, "v %f %f %f", x, y, z);
-	return r == 3;
+	return r == -1 ? -1 : r != 3;
 }
 
 int get_int_from_string(char* str, int* f){
@@ -88,16 +88,23 @@ int main(int argc, char* argv[]){
 	while (keepGoing){
 		keepGoing = read_short_line_truncated(f, buf, bin, LEN);
 		if (keepGoing){
-			if (parse_line(buf, &x, &y, &z)
-				&& fprintf(fo, "particle %s %c%f %c%f %c%f %f %f %f %f %d %s\n",
+			switch (parse_line(buf, &x, &y, &z)){
+				
+			case -1:
+				yeet("Problem while parsing input file\n", 1);
+				/* yeet is noreturn */
+			
+			case 0:
+				if (fprintf(fo, "particle %s %c%f %c%f %c%f %f %f %f %f %d %s\n",
 					argv[3],
 					coordSpace, x, coordSpace, y, coordSpace, z,
 					bx, by, bz, speed, count,
 					force == 1.0 ? "force" : force == 0.0 ? "normal" :
 						force * RAND_MAX >= rand() ? "force" : "normal")
 					<= 0)
-				yeet("Problem while writing to output file\n", 1);
-			++lineCount;
+					yeet("Problem while writing to output file\n", 1);
+				++lineCount;
+			}
 		}
 	}
 	

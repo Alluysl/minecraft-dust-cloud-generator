@@ -67,9 +67,9 @@ Run `cl src/gen_obj.c` to compile the generator that accepts any particle but no
 
 ### Generators
 
-* Both OBJ-based generators only consider vertices, they don't "fill" faces with particles.
+* Both generators only consider vertices, they don't "fill" faces with particles.
 * The texture-based generator only supports albedo, for obvious reasons. Additionally, when a vertex has a different color on faces it's a part of, it will average the colors, which can have unexpected results, such as purple particles between the blue pants and the brown hands of Steve as shown in the gallery below. Note that this only happens because the model that was used has its arms fused with the body, else there would have been two particles of their own right color. It however shows what can happen on the border of two colors.
-* Naturally, the single-color OBJ-based generator only outputs particles of one color.
+* Naturally, the fixed particle generator only outputs the same particle, with no color variation outside of the possible randomized vanilla amount.
 * The "randomness" of the force chance uses the rand function which is always set with the same (default) seed, meaning the results are always the same in-between runs. I consider it as more of a blessing than a curse since it makes it easier to compare the output functions based on small changes in the input, and pseudo-randomness provides the right proportions without creating patterns just fine. If you wish to be able to set the seed, or have the seed set based on the current time so it changes everytime, please open an issue.
 
 ### Minecraft

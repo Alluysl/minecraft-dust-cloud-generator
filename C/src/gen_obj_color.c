@@ -12,9 +12,6 @@ void yeet(char* message, int usePerror){
 	exit(EXIT_FAILURE);
 }
 
-int isYes(char c){ return c == 'y' || c == 'Y' || c == '1'; }
-int isNo(char c){ return c == 'n' || c == 'N' || c == '0'; }
-
 int main(int argc, char* argv[]){
 	
 	int r;

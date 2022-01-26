@@ -41,7 +41,7 @@ vector3lArray faceArray_get(faceArray* arr, size_t pos){
 }
 
 void faceArray_free(faceArray* arr){
-	for (int i = 0; i < arr->size; ++i)
+	for (size_t i = 0; i < arr->size; ++i)
 		vector3lArray_free(arr->faces + i);
 	free(arr->faces);
 }

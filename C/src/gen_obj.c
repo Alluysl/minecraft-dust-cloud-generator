@@ -92,7 +92,7 @@ int main(int argc, char* argv[]){
 				
 			case -1:
 				yeet("Problem while parsing input file\n", 1);
-				/* yeet is noreturn */
+				break; /* yeet is noreturn but specify for compiler */
 			
 			case 0:
 				if (fprintf(fo, "particle %s %c%f %c%f %c%f %f %f %f %f %d %s\n",

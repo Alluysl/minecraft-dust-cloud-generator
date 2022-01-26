@@ -60,7 +60,8 @@ objLineReadingResult read_line(FILE* f, char** line,
 	
 	fpos_t fpos;
 	char* res, *r;
-	int c, size = 0;
+	int c;
+	size_t size = 0;
 	
 	/* Get line length */
 	
@@ -216,7 +217,7 @@ objData* objData_fill_vertex_colors(objData* data, char* texturePath, double pix
 	/* (removed due to not being very useful and */
 	/* Valgrind complaining about non-leaked "possibly lost" blocks) */
 	/* #pragma omp parallel for */
-	for (int i = 0; i < data->vertices.size; ++i)
+	for (size_t i = 0; i < data->vertices.size; ++i)
 		vertexColors[i] = vector4f_zero();
 	
 	long* vertexColorContributionCounts = calloc(data->vertices.size, sizeof(long));
@@ -398,7 +399,8 @@ objData* objData_load_from_file(char* path, char* texturePath, double pixelFloat
 				keepGoing = 0;
 				break;
 			
-			/* Do nothing in empty case */
+			case OBJ_LR_EMPTY: /* do nothing in empty case */
+				break;
 			}
 		}
 		

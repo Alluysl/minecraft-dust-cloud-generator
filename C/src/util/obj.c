@@ -160,35 +160,31 @@ objLineParsingResult objData_parse_line(objData* data, char* line){
 int objData_get_face_vertex_ids(objData* data, vector3lArray face,
 	size_t faceVertexId, size_t* vertexId, size_t* uvId){
 	
+	/* Get indices and map from ]-inf, +inf[ to [1, +inf[ (relative/absolute to absolute) */
+	
 	vector3l faceVertex = vector3lArray_get(&face, faceVertexId);
-	*vertexId = faceVertex.x;
-	*uvId = faceVertex.y;
+	*vertexId = faceVertex.x + (faceVertex.x < 0) * (data->vertices.size + 1);
+	*uvId     = faceVertex.y + (faceVertex.y < 0) * (data->uv.size + 1);
 	
 	if (!*vertexId || !*uvId){ /* indices start at 1 */
 		
 		fprintf(stderr, "Invalid vertex/UV index %ld/%ld, skipping, not warning for future vertices\n",
-			*vertexId, *uvId);
+			faceVertex.x, faceVertex.y);
 		return 1;
 	}
 	
-	/* Map from ]-inf, +inf[ to [1, +inf[ */
-	
-	*vertexId += (*vertexId < 0) * (data->vertices.size + 1);
-	*uvId += (*uvId < 0) * (data->uv.size + 1);
-	
 	/* Check if resulting index is in bounds of gathered indices */
 	
-	if (*vertexId > data->vertices.size || *uvId > data->uv.size
-		|| *vertexId <= 0 || *uvId <= 0){
+	if (*vertexId > data->vertices.size || *uvId > data->uv.size){
 		
 		if (*vertexId > data->vertices.size || *vertexId <= 0)
-			fprintf(stderr, "Invalid vertex index %ld (possibly translated from negative), "
+			fprintf(stderr, "Invalid vertex index %lu (from %ld), "
 					"array size %ld, skipping, not warning for future vertices\n",
-				*vertexId, data->vertices.size);
+				*vertexId, faceVertex.x, data->vertices.size);
 		else
-			fprintf(stderr, "Invalid UV index %ld (possibly translated from negative), "
+			fprintf(stderr, "Invalid UV index %lu (from %ld), "
 					"array size %ld, skipping, not warning for future vertices\n",
-				*uvId, data->uv.size);
+				*uvId, faceVertex.y, data->uv.size);
 		return 1;
 	}
 	
@@ -238,8 +234,8 @@ objData* objData_fill_vertex_colors(objData* data, char* texturePath, double pix
 	for (size_t faceId = 0; faceId < data->faces.size; ++faceId){
 		
 		size_t* vertexIds = NULL; /* set to NULL so can be freed, simplifies logic */
-		vector3f* uvs = NULL; /* same thing */
-		char* turns;
+		vector3f* uvs = NULL;     /* same thing */
+		char* turns = NULL;       /* same thing */
 		vector3lArray face = faceArray_get(&data->faces, faceId);
 		
 		if (face.size < 3) /* somehow? */

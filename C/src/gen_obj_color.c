@@ -46,7 +46,8 @@ int main(int argc, char* argv[]){
 	if ((r = sscanf(argv[9], "%f", &speed)) != 1) yeet("Couldn't parse speed\n", r == -1);
 	if ((r = sscanf(argv[10], "%d", &count)) != 1) yeet("Couldn't parse count\n", r == -1);
 	if ((r = sscanf(argv[11], "%f", &force)) != 1) yeet("Couldn't parse force chance\n", r == -1);
-	if (argc > 12 && (r = sscanf(argv[12], "%lf", &pixelFloatPrecision)) != 1) yeet("Couldn't parse pixel precision\n", r == -1);
+	if (argc > 12 && (r = sscanf(argv[12], "%lf", &pixelFloatPrecision)) != 1)
+		yeet("Couldn't parse pixel precision\n", r == -1);
 	
 	objData* data = objData_load_from_file(argv[1], argv[3], pixelFloatPrecision);
 	if (data == NULL){
@@ -79,10 +80,13 @@ int main(int argc, char* argv[]){
 		}
 		
 		if (fprintf(fo, "particle minecraft:dust %f %f %f %f %c%f %c%f %c%f %f %f %f %f %d %s\n",
-			c.x, c.y, c.z, c.w * size, /* color and size */
-			coordSpace, v.x, coordSpace, v.y, coordSpace, v.z, bx, by, bz, /* position and bounding box */
-			speed, count,
-			c.w * force == 1.0f ? "force" : c.w * force == 0.0f ? "normal" : c.w * force * RAND_MAX >= rand() ? "force" : "normal") <= 0)
+				c.x, c.y, c.z, c.w * size, /* color and size */
+				coordSpace, v.x, coordSpace, v.y, coordSpace, v.z, /* position */
+				bx, by, bz, /* bounding box */
+				speed, count,
+				c.w * force == 1.0f ? "force" : c.w * force == 0.0f ? "normal" :
+					c.w * force * RAND_MAX >= rand() ? "force" : "normal")
+			<= 0)
 			yeet("Problem while writing to output file\n", 1);
 	}
 	

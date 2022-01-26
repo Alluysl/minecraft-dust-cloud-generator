@@ -157,7 +157,8 @@ objLineParsingResult objData_parse_line(objData* data, char* line){
 	return OBJ_LP_SKIPPED;
 }
 
-int objData_get_face_vertex_ids(objData* data, vector3lArray face, size_t faceVertexId, size_t* vertexId, size_t* uvId){
+int objData_get_face_vertex_ids(objData* data, vector3lArray face,
+	size_t faceVertexId, size_t* vertexId, size_t* uvId){
 	
 	vector3l faceVertex = vector3lArray_get(&face, faceVertexId);
 	*vertexId = faceVertex.x;
@@ -181,10 +182,12 @@ int objData_get_face_vertex_ids(objData* data, vector3lArray face, size_t faceVe
 		|| *vertexId <= 0 || *uvId <= 0){
 		
 		if (*vertexId > data->vertices.size || *vertexId <= 0)
-			fprintf(stderr, "Invalid vertex index %ld (possibly translated from negative), array size %ld, skipping, not warning for future vertices\n",
+			fprintf(stderr, "Invalid vertex index %ld (possibly translated from negative), "
+					"array size %ld, skipping, not warning for future vertices\n",
 				*vertexId, data->vertices.size);
 		else
-			fprintf(stderr, "Invalid UV index %ld (possibly translated from negative), array size %ld, skipping, not warning for future vertices\n",
+			fprintf(stderr, "Invalid UV index %ld (possibly translated from negative), "
+					"array size %ld, skipping, not warning for future vertices\n",
 				*uvId, data->uv.size);
 		return 1;
 	}
@@ -200,7 +203,7 @@ objData* objData_abort_load(objData* data, char* message, int isSystem){
 }
 
 static inline int isDoublePositive(double d){
-	return !((unsigned long long)d & ((unsigned long long)1 << 63)); /* IEEE 754 go wheeee */
+	return !((unsigned long long)d & ((unsigned long long)1 << 63)); /* IEEE 754 fun */
 }
 
 objData* objData_fill_vertex_colors(objData* data, char* texturePath, double pixelFloatPrecision){
@@ -250,7 +253,8 @@ objData* objData_fill_vertex_colors(objData* data, char* texturePath, double pix
 			free(turns);
 			free(vertexColors);
 			free(vertexColorContributionCounts);
-			return objData_abort_load(data, "Couldn't allocate memory while processing faces for vertex colors\n", 1);
+			return objData_abort_load(data, "Couldn't allocate memory "
+				"while processing faces for vertex colors\n", 1);
 		}
 		
 		double totalAngle = 0.0;
@@ -274,8 +278,9 @@ objData* objData_fill_vertex_colors(objData* data, char* texturePath, double pix
 			}
 			if (i >= 2){ /* can use this vertex and previous two to get angle */
 				
-				vector3f a = vector3f_difference(uvs[i - 2], uvs[(i - 1) % face.size]), /* ingoing edge */
-					b = vector3f_difference(uvs[(i - 1) % face.size], uvs[i % face.size]); /* outgoing edge */
+				/* ingoing/outgoing edge vectors */
+				vector3f a = vector3f_difference(uvs[i - 2], uvs[(i - 1) % face.size]), /* in */
+					b = vector3f_difference(uvs[(i - 1) % face.size], uvs[i % face.size]); /* out*/
 				
 				double angle = atan2(a.x * b.y - a.y * b.x, a.x * b.x + a.y * b.y);
 				turns[(i - 1) % face.size] = isDoublePositive(angle);
@@ -361,7 +366,9 @@ objData* objData_load_from_file(char* path, char* texturePath, double pixelFloat
 		long lineCount = 0;
 		int keepGoing = 1, plr, alreadyWarned = 0;
 		
-		FILE* f = fopen(path, "rb"); /* binary and not text so jumping around actually works on Windows (CRLF issues) */
+		/* opening file in binary mode and not text mode so that  */
+		/* jumping around actually works on Windows (CRLF issues) */
+		FILE* f = fopen(path, "rb");
 		if (f == NULL)
 			return objData_abort_load(data, "Couldn't open input file\n", 1);
 		
@@ -381,7 +388,8 @@ objData* objData_load_from_file(char* path, char* texturePath, double pixelFloat
 				}
 					
 				if (plr == OBJ_LP_INVALID && !alreadyWarned){
-					printf("Warning: invalid line %ld, skipping, not warning for future lines\n", lineCount + 1);
+					printf("Warning: invalid line %ld, skipping, not warning for future lines\n",
+						lineCount + 1);
 					alreadyWarned = 1;
 				}
 				

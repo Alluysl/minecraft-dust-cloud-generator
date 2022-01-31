@@ -213,10 +213,6 @@ objData* objData_fill_vertex_colors(objData* data, char* texturePath, double pix
 	if (vertexColors == NULL)
 		return objData_abort_load(data, "Couldn't allocate vertex color buffer array\n", 1);
 	
-	/* uncomment and use -fopenmp option with GCC for parallelization */
-	/* (removed due to not being very useful and */
-	/* Valgrind complaining about non-leaked "possibly lost" blocks) */
-	/* #pragma omp parallel for */
 	for (size_t i = 0; i < data->vertices.size; ++i)
 		vertexColors[i] = vector4f_zero();
 	
@@ -285,10 +281,6 @@ objData* objData_fill_vertex_colors(objData* data, char* texturePath, double pix
 			}
 		}
 		
-		/* uncomment and use -fopenmp option with GCC for parallelization */
-		/* (removed due to not being very useful and */
-		/* Valgrind complaining about non-leaked "possibly lost" blocks) */
-		/* #pragma omp parallel for */
 		for (size_t i = 0; i < face.size; ++i){
 			
 			vector3f bisector;
@@ -329,10 +321,6 @@ objData* objData_fill_vertex_colors(objData* data, char* texturePath, double pix
 	
 	free_texture(tex); /* free image data */
 	
-	/* uncomment and use -fopenmp option with GCC for parallelization */
-	/* (removed due to not being very useful and */
-	/* Valgrind complaining about non-leaked "possibly lost" blocks) */
-	/* #pragma omp parallel for */
 	for (size_t i = 0; i < data->vertices.size; ++i){
 		if (vertexColorContributionCounts[i] && vertexColors[i].w){
 			vertexColors[i].x /= vertexColors[i].w;

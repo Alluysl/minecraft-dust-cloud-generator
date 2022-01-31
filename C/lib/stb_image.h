@@ -101,7 +101,9 @@ RECENT REVISION HISTORY:
 #ifndef STBI_INCLUDE_STB_IMAGE_H
 #define STBI_INCLUDE_STB_IMAGE_H
 
+#ifdef __GNUC__
 #pragma GCC system_header /* Added to fix compiler warnings (a lib should pass Wall...) */
+#endif
 
 // DOCUMENTATION
 //

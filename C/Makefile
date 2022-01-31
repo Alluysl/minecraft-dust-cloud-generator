@@ -1,6 +1,6 @@
 SRC = src
 UTIL = src/util
-CFLAGS = -Wall -Wextra -Wpedantic
+CFLAGS += -Wall -Wextra -Wpedantic
 
 all: gen_obj gen_obj_color
 
